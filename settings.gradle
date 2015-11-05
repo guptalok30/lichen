@@ -1,6 +1,7 @@
 rootProject.name = 'lichen'
 
-include ':lichen-mock-service'
+include ':lichen-mock-service',
+        ':event-audit'
 
 def setBuildFile(project) {
     project.buildFileName = "${project.name}.gradle"
