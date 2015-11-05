@@ -1,0 +1,38 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[APP]%d [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="METRICS" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[METRICS]%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="AUDIT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[AUDIT]%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.peoplenet.lichen" level="INFO"/>
+
+    <logger name="metrics" level="ALL" additivity="false">
+        <appender-ref ref="METRICS" />
+    </logger>
+
+    <logger name="metrics.retrofit" level="INFO" additivity="false">
+        <appender-ref ref="METRICS" />
+    </logger>
+
+    <logger name="audit" level="ALL" additivity="false">
+        <appender-ref ref="AUDIT" />
+    </logger>
+
+    <root level="ERROR">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

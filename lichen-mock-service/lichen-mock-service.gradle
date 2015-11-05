@@ -1,0 +1,13 @@
+apply plugin: "io.ratpack.ratpack-groovy"
+apply plugin: "com.github.johnrengelman.shadow"
+
+dependencies {
+    runtime 'ch.qos.logback:logback-classic:1.1.3'
+
+    compile "com.peoplenet:ratpack-common:${serviceCommonVersion}"
+    compile "com.peoplenet:event-ledger-api:${eventLedgerVersion}"
+    compile "com.peoplenet:event-ledger-client:${eventLedgerVersion}"
+    compile("com.peoplenet:retrofit-client:${serviceCommonVersion}") {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+}
