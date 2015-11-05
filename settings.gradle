@@ -1,0 +1,12 @@
+rootProject.name = 'lichen'
+
+include ':lichen-mock-service'
+
+def setBuildFile(project) {
+    project.buildFileName = "${project.name}.gradle"
+    project.children.each {
+        setBuildFile(it)
+    }
+}
+
+setBuildFile(rootProject)

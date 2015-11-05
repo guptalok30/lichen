@@ -1,0 +1,54 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven {
+            name 'PeopleNet Cloud'
+            url 'http://artifactory.dev-tools.connectedfleet.io:8081/artifactory/repo'
+        }
+    }
+    dependencies {
+        classpath "com.peoplenet:gradle-plugins:${peoplenetGradlePluginVersion}"
+        classpath "io.ratpack:ratpack-gradle:${ratpackVersion}"
+        classpath "com.github.jengelman.gradle.plugins:shadow:1.2.1"
+    }
+}
+
+apply plugin: 'com.peoplenet.base'
+
+subprojects {
+    apply plugin: 'com.peoplenet.groovy'
+
+    dependencies {
+        compile 'org.slf4j:slf4j-api:1.7.12'
+
+        testCompile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+        testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+        testCompile 'cglib:cglib-nodep:3.1'
+        testCompile 'org.objenesis:objenesis:2.1'
+    }
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+projects {
+    apply plugin: 'idea'
+
+    idea {
+        project {
+            jdkName = '1.8'
+            languageLevel = '1.8'
+            vcs = 'Git'
+        }
+    }
+}
+
+task build() {
+  doFirst {
+    new File('build').mkdir()
+    file('build/version').text = version.toString()
+    file('build/packer.properties').text = "images=lichen-${version.toString()}"
+  }
+}
+
