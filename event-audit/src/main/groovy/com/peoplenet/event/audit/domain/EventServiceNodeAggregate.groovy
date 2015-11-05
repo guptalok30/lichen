@@ -5,10 +5,11 @@ package com.peoplenet.event.audit.domain
  */
 class EventServiceNodeAggregate {
 
-    String name
+    String serviceName
+    String eventType
     Double meanDuration
     Integer count
 
-    EventServiceNodeAggregate[] children
+    List<EventServiceNodeAggregate> children = []
 
 }
