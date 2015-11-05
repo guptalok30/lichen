@@ -12,6 +12,7 @@ class AggregateService {
 
 
     EventTraceAggregate getAggregateTrace() {
+
         mockData()
     }
 
