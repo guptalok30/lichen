@@ -14,7 +14,21 @@ buildscript {
     }
 }
 
+import static groovy.io.FileType.FILES
+
 apply plugin: 'com.peoplenet.base'
+
+ext.getImages = {
+   List<String> imageTypes = []
+    new File('.').eachFileRecurse(FILES) {
+        if(it.name.endsWith('.yml') && it.name.startsWith('playbook-')) {
+            String image = it.name.replace(".yml", "")
+            image = image.replace("playbook-", "")
+            imageTypes.add(image)
+        }
+    }
+    return imageTypes
+}
 
 subprojects {
     apply plugin: 'com.peoplenet.groovy'
@@ -44,11 +58,29 @@ projects {
     }
 }
 
-task build() {
-  doFirst {
-    new File('build').mkdir()
-    file('build/version').text = version.toString()
-    file('build/packer.properties').text = "images=lichen-${version.toString()}"
-  }
+task clean() {
+    doFirst {
+        delete 'build', 'image.json'
+    }
 }
+
+task imageTemplate(type: Copy) {
+    from 'templates'
+    into "${projectDir}"
+    include 'image.json.groovytemplate'
+    rename { file -> 'image.json'}
+    expand(images : getImages(), version: version)
+}
+
+task build(dependsOn: 'imageTemplate') {
+    doFirst {
+        new File('build').mkdir()
+        file('build/version').text = version.toString()
+        String images = getImages().collect {
+            "${it}-${version}"
+        }.join(',')
+        file('build/packer.properties').text = "images=${images}"
+    }
+}
+
 

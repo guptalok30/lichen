@@ -1,0 +1,50 @@
+{
+  "variables": {
+    "ami_version" : "${version}",
+    "source_ami": null,
+    "playbook_dir": "build/ansible",
+    "ec2_az": "us-east-1d"
+  },
+  "builders": [
+   <% images.eachWithIndex{ String image, int index ->
+      if (index > 0) { %>, <% } %>{
+        "name": "${image}",
+        "type": "amazon-ebs",
+        "region": "us-east-1",
+        "availability_zone": "{{user `ec2_az`}}",
+        "source_ami": "{{user `source_ami`}}",
+        "instance_type": "m3.medium",
+        "associate_public_ip_address": true,
+        "ssh_username": "ubuntu",
+        "ami_name": "${image}-${version}-{{isotime \"2006-01-02_15-04-05\"}}",
+        "vpc_id": "vpc-0eeb7e6b",
+        "subnet_id": "subnet-946cbbcd",
+        "security_group_id": "sg-9bc965ff",
+        "tags": {
+          "Date_Created": "{{isotime \"2006-01-02_15-04-05\"}}",
+          "AmiNameAndVersion": "${image}-${version}",
+          "SourceAMI": "{{user `source_ami`}}"
+        }
+      }<% } %>
+  ],
+  "provisioners": [
+    <% images.eachWithIndex{ String image, int index ->
+        if (index > 0) { %>, <% } %>{
+          "only": ["${image}"],
+          "type": "ansible-local",
+          "playbook_file": "playbook-${image}.yml",
+          "playbook_dir": "{{ user `playbook_dir` }}",
+          "extra_arguments": ["-e", "'image=${image} app_version={{user `ami_version`}}'"]
+        }<% } %>
+  ],
+  "post-processors": [
+    <% images.eachWithIndex{ String image, int index ->
+        if (index > 0) { %>, <% } %>{
+          "only": ["${image}"],
+          "type": "consul",
+          "address": "consul.internal.connectedfleet.io",
+          "datacenter": "internal-east",
+          "key": "amis/${image}/${version}"
+        }<% } %>
+  ]
+}
