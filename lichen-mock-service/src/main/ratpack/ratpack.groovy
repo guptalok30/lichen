@@ -29,27 +29,27 @@ ratpack {
 
         //fault -> fault_decorator -> decorated fault
         post("lichen_fault_dec") { ctx ->
-            renderIt(ctx, 'lichen_dec_fault', 'fault_decorator', 100)
+            renderIt(ctx, 'lichen_fault', 'lichen_dec_fault', 'fault_decorator', 100)
         }
 
         //decorated fault -> entity -> vehicle_update
         post("lichen_dec_fault_entity") { ctx ->
-            renderIt(ctx, 'lichen_vehicle_update', 'entity', 100)
+            renderIt(ctx, 'lichen_dec_fault', 'lichen_vehicle_update', 'entity', 100)
         }
 
         //decorated fault -> guidance service -> guidance
         post("lichen_dec_fault_guidance") { ctx ->
-            renderIt(ctx, 'lichen_guidance', 'guidance-service', 1000)
+            renderIt(ctx, 'lichen_dec_fault', 'lichen_guidance', 'guidance-service', 1000)
         }
 
         //guidance -> entity -> nothing
         post("lichen_guidance_entity") { ctx ->
-            renderIt(ctx, "entity", 250)
+            renderIt(ctx, 'lichen_guidance', 'entity', 250)
         }
 
         //guidance -> notification -> nothing
         post("lichen_guidance_notification") { ctx ->
-            renderIt(ctx, 'notification', 500)
+            renderIt(ctx, 'lichen_guidance', 'notification', 500)
         }
 
         get("health") {
@@ -59,23 +59,22 @@ ratpack {
     }
 }
 
-void renderIt(Context ctx, String event, String service, int maxTimeout, boolean publish = true) {
+void renderIt(Context ctx, String consumedEvent, String event, String service, int maxTimeout) {
     Blocking.op {
         sleep(ctx.get(Random).nextInt(maxTimeout) + 100)
     }.next(
-        ctx.get(EventLedgerService).publishEvent(
-                event, service, """{"event":"${event}", "service":"${service}"}""", ctx.get(Trace))
+        ctx.get(EventLedgerService).publishEvent(consumedEvent, event, service, """{"event":"${event}", "service":"${service}"}""", ctx.get(Trace))
     ).then {
         ctx.render "OK"
     }
 }
 
-void renderIt(Context ctx, String service, int maxTimeout) {
+void renderIt(Context ctx, String consumedEvent, String service, int maxTimeout) {
     Blocking.op {
         sleep(ctx.get(Random).nextInt(maxTimeout) + 100)
-    }.next(
-            ctx.get(EventLedgerService).auditEvent(service, "", ctx.get(Trace))
-    ).then {
+    }.next {
+            ctx.get(EventLedgerService).auditEvent(service, consumedEvent, ctx.get(Trace))
+    }.then {
         ctx.render "OK"
     }
 }
