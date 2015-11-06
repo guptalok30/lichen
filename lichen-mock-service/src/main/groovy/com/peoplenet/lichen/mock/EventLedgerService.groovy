@@ -1,5 +1,6 @@
 package com.peoplenet.lichen.mock
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.io.ByteArrayDataOutput
 import com.google.common.io.ByteStreams
 import com.google.common.net.MediaType
@@ -20,11 +21,14 @@ import retrofit.mime.TypedByteArray
 class EventLedgerService implements Service {
     Logger auditLog = LoggerFactory.getLogger('audit')
     EventLedgerApi eventLedgerApi
+
     TraceModule.Config config
+    ObjectMapper objectMapper
 
     @Inject
-    EventLedgerService(TraceModule.Config config) {
+    EventLedgerService(TraceModule.Config config, ObjectMapper objectMapper) {
         this.config = config
+        this.objectMapper = objectMapper
     }
 
     @Override
@@ -50,17 +54,17 @@ class EventLedgerService implements Service {
     }
 
     void auditEvent(String serviceName, String consumedEvent, Trace trace) {
-        String kv = [
-                "duration=${trace.durationToNow()}",
-                "timestamp=${System.currentTimeMillis()}",
-                "service=${serviceName}",
-                "consumedEvent=${consumedEvent}",
-                "traceTag=${trace.traceId}",
-                "parentConsumedEvent=${trace.parentConsumedEvent}",
-                "parentService=${trace.parentService}"
-        ].join(", ")
+        TraceAudit traceAudit = new TraceAudit(
+                duration: trace.durationToNow(),
+                timestamp: System.currentTimeMillis(),
+                service: serviceName,
+                consumedEvent: consumedEvent,
+                traceId: trace.traceId,
+                parentConsumedEvent: trace.parentConsumedEvent,
+                parentService: trace.parentService
+        )
 
-        auditLog.info(kv)
+        auditLog.info(objectMapper.writeValueAsString(traceAudit))
     }
 
     byte[] decoratePayload(String consumedEvent, String service, Trace trace, byte[] payload) {
