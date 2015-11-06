@@ -1,5 +1,6 @@
 package com.peoplenet.lichen.mock
 
+import com.google.common.base.Strings
 import ratpack.groovy.handling.GroovyContext
 import ratpack.groovy.handling.GroovyHandler
 
@@ -18,8 +19,8 @@ class TraceHandler extends GroovyHandler {
                     trace: true,
                     startTimeNanos: System.nanoTime(),
                     traceId: ctx.request.getHeaders().get('TRACE_ID'),
-                    parentConsumedEvent: ctx.request.getHeaders().get('PARENT_CONSUMED_EVENT'),
-                    parentService: ctx.request.getHeaders().get('PARENT_SERVICE'))))
+                    parentConsumedEvent: Strings.emptyToNull(ctx.request.getHeaders().get('PARENT_CONSUMED_EVENT')),
+                    parentService: Strings.emptyToNull(ctx.request.getHeaders().get('PARENT_SERVICE')))))
         }
 
     }
