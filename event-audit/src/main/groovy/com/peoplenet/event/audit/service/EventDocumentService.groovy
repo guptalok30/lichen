@@ -1,7 +1,11 @@
 package com.peoplenet.event.audit.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.squareup.okhttp.*
+import com.squareup.okhttp.MediaType
+import com.squareup.okhttp.OkHttpClient
+import com.squareup.okhttp.Request
+import com.squareup.okhttp.RequestBody
+import com.squareup.okhttp.Response
 
 import javax.inject.Named
 
