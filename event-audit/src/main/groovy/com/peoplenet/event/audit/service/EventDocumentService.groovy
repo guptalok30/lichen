@@ -23,7 +23,12 @@ class EventDocumentService {
 
         //add the eventServiceNodeKey
         StringJoiner joiner = new StringJoiner(":")
-        String eventServiceNodeKey = joiner.add(documentSource.get('service')).add(documentSource.get('eventType')).add(documentSource.get('parentService')).add(documentSource.get('parentEventType')).toString()
+        joiner.add(documentSource.get('service')).add(documentSource.get('eventType'))
+        if (documentSource.get('parentService') != null && documentSource.get('parentEventType') != null) {
+            joiner.add(documentSource.get('parentService')).add(documentSource.get('parentEventType'))
+        }
+        String eventServiceNodeKey = joiner.toString()
+
         documentSource.put('eventServiceNodeKey', eventServiceNodeKey)
 
         String json = objectMapper.writeValueAsString(documentSource)
