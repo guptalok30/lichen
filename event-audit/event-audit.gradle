@@ -18,6 +18,7 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
     compile "org.springframework.boot:spring-boot-starter-parent:${springBootVersion}"
     compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+    compile "com.squareup.okhttp:okhttp:2.5.0"
 
 //    compile "org.slf4j:slf4j-api:${slf4jVersion}"
 //    compile "ch.qos.logback:logback-classic:${logbackVersion}"
