@@ -66,10 +66,9 @@ class AggregateService {
                     parentEventType = tokens[3]
                 }
                 // originating consumer, no parent consumed event
-                if (tokens.size() == 3) {
+                if (tokens.size() == 2) {
                     serviceName = tokens[0]
                     eventType = tokens[1]
-                    parentServiceName = tokens[2]
                 }
                 avgDuration = bucket?.value.value
                 count = bucket.docCount
