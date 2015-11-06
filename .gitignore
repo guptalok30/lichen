@@ -10,3 +10,5 @@ build/
 *.iml
 .idea/
 image.json
+
+event-audit/event-audit.iml
