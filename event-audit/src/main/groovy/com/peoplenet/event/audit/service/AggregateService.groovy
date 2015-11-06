@@ -20,7 +20,7 @@ class AggregateService {
 
     OkHttpClient client = new OkHttpClient()
 
-    EventTraceAggregate getAggregateTrace() {
+    List<EventTraceAggregate> getAggregateTrace() {
 
         String body = """{
             "aggs" : {
@@ -46,6 +46,12 @@ class AggregateService {
 
         AggregationResult result = mapper.readValue(resultString, AggregationResult)
 
+        List<EventServiceNodeAggregate> aggregates = buildEventServiceNodeAggregates(result)
+        buildEventTraceAggregate(aggregates)
+    }
+
+    private ArrayList<EventServiceNodeAggregate> buildEventServiceNodeAggregates(AggregationResult result) {
+
         List<EventServiceNodeAggregate> aggregates = []
         result?.aggregations?.aggregation?.buckets.each { bucket ->
             EventServiceNodeAggregate aggregate = new EventServiceNodeAggregate()
@@ -70,21 +76,22 @@ class AggregateService {
             }
             aggregates.add(aggregate)
         }
-        buildEventTraceAggregate(aggregates)
+        aggregates
     }
 
-    private EventTraceAggregate buildEventTraceAggregate(List<EventServiceNodeAggregate> aggregates) {
+    private List<EventTraceAggregate> buildEventTraceAggregate(List<EventServiceNodeAggregate> aggregates) {
 
-        EventTraceAggregate traceAggregate = new EventTraceAggregate()
+        List<EventTraceAggregate> traceAggregates = []
         MultiValueMap<String, EventServiceNodeAggregate> childrenByParent = new LinkedMultiValueMap()
         aggregates.each {
             if (it.parentEventType != null) {
                 String parentKey = "${it.parentServiceName}:${it.parentEventType}"
-
                 println "adding parentKey ${parentKey}"
                 childrenByParent.add(parentKey, it)
             } else {
+                EventTraceAggregate traceAggregate = new EventTraceAggregate()
                 traceAggregate.origin = it
+                traceAggregates.add(traceAggregate)
             }
         }
 
@@ -96,8 +103,8 @@ class AggregateService {
                 it.children.addAll(children)
             }
         }
-        println traceAggregate
-        traceAggregate
+        println traceAggregates
+        traceAggregates
     }
 
 //    private EventTraceAggregate mockData() {

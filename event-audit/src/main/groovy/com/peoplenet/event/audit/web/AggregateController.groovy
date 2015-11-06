@@ -18,7 +18,7 @@ class AggregateController {
 
 
     @RequestMapping(value = "/eventtrace/aggregate", method = RequestMethod.GET)
-    EventTraceAggregate getEventTraceAggregates() {
+    List<EventTraceAggregate> getEventTraceAggregates() {
         aggregateService.getAggregateTrace()
     }
 
