@@ -20,6 +20,12 @@ class EventDocumentService {
     OkHttpClient client = new OkHttpClient()
 
     String save(final String indexName, final String typeName, final Map documentSource) {
+
+        //add the eventServiceNodeKey
+        StringJoiner joiner = new StringJoiner(":")
+        String eventServiceNodeKey = joiner.add(documentSource.get('service')).add(documentSource.get('eventType')).add(documentSource.get('parentService')).add(documentSource.get('parentEventType')).toString()
+        documentSource.put('eventServiceNodeKey', eventServiceNodeKey)
+
         String json = objectMapper.writeValueAsString(documentSource)
         RequestBody body = RequestBody.create(JSON, json)
 
